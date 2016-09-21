@@ -2,7 +2,7 @@
  * config.h
  *
  *  Created on: Sep 12, 2016
- *      Author: robotics
+ *      Author: Ryan Pope <poperyan73@gmail.com
  */
 
 #ifndef SRC_CONFIG_H_
@@ -46,8 +46,10 @@
 #define INTAKE_TALON				7
 
 // Solenoids
-#define CLUTCH_SOL					0
-#define LOCK_SOL					1
+#define CLUTCH_SOL_FORWARD			0
+#define CLUTCH_SOL_REVERSE			1
+#define LOCK_SOL_FORWARD			2
+#define LOCK_SOL_REVERSE			3
 
 // Compressor
 #define COMPRESSOR_PORT				0

@@ -21,15 +21,13 @@ Zed::Zed() {
 
 	this->compressor = new Compressor(COMPRESSOR_PORT);
 
-	this->clutchSolenoid = new DoubleSolenoid(CLUTCH_SOL);
-	this->lockSolenoid = new DoubleSolenoid(LOCK_SOL);
+	this->clutchSolenoid = new DoubleSolenoid(CLUTCH_SOL_FORWARD, CLUTCH_SOL_REVERSE);
+	this->lockSolenoid = new DoubleSolenoid(LOCK_SOL_FORWARD, LOCK_SOL_REVERSE);
 
 	this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
 	this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 
 	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
-
-	compressor->Start();
 }
 
 
@@ -146,10 +144,6 @@ void Zed::OperatorControl() {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 		}
  	}
-}
-
-void Zed::Disabled() {
-	this->compressor->Stop();
 }
 
 START_ROBOT_CLASS(Zed);

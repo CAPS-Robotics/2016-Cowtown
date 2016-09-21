@@ -2,7 +2,7 @@
  * Zed.h
  *
  *  Created on: Sep 12, 2016
- *      Author: robotics
+ *      Author: Ryan Pope <poperyan73@gmail.com
  */
 
 #ifndef SRC_ZED_H_
@@ -34,7 +34,7 @@ public:
 	~Zed() {};
 
 	void RobotInit();
-	void Disabled();
+	void Disabled() {};
 	void Autonomous();
 	void OperatorControl();
 	void Test() {};
