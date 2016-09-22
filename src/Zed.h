@@ -16,6 +16,7 @@ float normalize(int joystickValue) {
 	return joystickValue / 128.f;
 }
 
+
 class Zed : public SampleRobot
 {
 public:
@@ -30,14 +31,21 @@ public:
 	DoubleSolenoid *lockSolenoid;
 	DigitalInput *limitSwitch;
 
+	std::thread * driveThread;
+	std::thread * inputThread;
+	bool driveRun = false;
+
 	Zed();
-	~Zed() {};
+	~Zed();
 
 	void RobotInit();
 	void Disabled() {};
 	void Autonomous();
 	void OperatorControl();
 	void Test() {};
+
+	void driveFunc();
+	void inputFunc();
 };
 
 

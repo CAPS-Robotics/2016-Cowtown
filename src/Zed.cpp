@@ -7,7 +7,7 @@
 
 #include <WPILib.h>
 #include <Config.h>
-#include <pthread.h>
+#include <thread>
 #include <Zed.h>
 
 Zed::Zed() {
@@ -28,8 +28,29 @@ Zed::Zed() {
 	this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 
 	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
+
+	driveThread = new std::thread(driveFunc);
+	inputThread = new std::thread(inputFunc);
+
+	driveThread->detach();
+	inputThread->detach();
 }
 
+Zed::~Zed() {
+	delete drive;
+	delete joystick;
+	delete leftIntakeTalon;
+	delete rightIntakeTalon;
+	delete intakeTalon;
+	delete clutchTalon;
+	delete compressor;
+	delete clutchSolenoid;
+	delete lockSolenoid;
+	delete limitSwitch;
+
+	delete driveThread;
+	delete inputThread;
+}
 
 void Zed::RobotInit() {
 
@@ -39,10 +60,7 @@ void Zed::Autonomous() {
 
 }
 
-void Zed::OperatorControl() {
-	bool winding;
-	bool shootReady;
-
+void Zed::driveFunc() {
 	float Kp = 0.044000;
 	float Ki = 0.000001;
 	float Kd = 0.000001;
@@ -54,8 +72,7 @@ void Zed::OperatorControl() {
 	float rCurrentSpeed = 0;
 	double oldTime = GetTime();
 
-	while (RobotBase::IsEnabled()) {
-
+	while (driveRun) {
 		double currentTime = GetTime();
 		// Left wheel PID loop
 		// Sets the current error of the speed from the desired speed
@@ -86,7 +103,14 @@ void Zed::OperatorControl() {
 
 		// Drive the robot using the PID corrected speeds
 		drive->TankDrive(lCurrentSpeed, rCurrentSpeed);
+	}
+}
 
+void Zed::inputFunc() {
+	bool winding;
+	bool shootReady;
+
+	while (driveRun) {
 		// If left bumper is pressed, run intake motors in
 		if (this->joystick->GetRawButton(JOY_BTN_LBM)) {
 			intakeTalon->Set(1.0f);
@@ -143,7 +167,14 @@ void Zed::OperatorControl() {
 		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady) {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 		}
- 	}
+	}
+}
+
+void Zed::OperatorControl() {
+	while (RobotBase::IsEnabled()) {
+		driveRun = true;
+	}
+	driveRun = false;
 }
 
 START_ROBOT_CLASS(Zed);
