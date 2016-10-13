@@ -33,6 +33,7 @@ public:
 
 	std::thread * driveThread;
 	std::thread * inputThread;
+	std::thread * shootThread;
 	bool driveRun = false;
 
 	Zed();
@@ -46,6 +47,7 @@ public:
 
 	void driveFunc();
 	void inputFunc();
+	void shootFunc();
 };
 
 

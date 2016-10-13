@@ -31,9 +31,11 @@ Zed::Zed() {
 
 	driveThread = new std::thread(driveFunc);
 	inputThread = new std::thread(inputFunc);
+	shootThread = new std::thread(shootFunc);
 
 	driveThread->detach();
 	inputThread->detach();
+	shootThread->detach();
 }
 
 Zed::~Zed() {
@@ -50,6 +52,7 @@ Zed::~Zed() {
 
 	delete driveThread;
 	delete inputThread;
+	delete shootThread;
 }
 
 void Zed::RobotInit() {
@@ -106,9 +109,39 @@ void Zed::driveFunc() {
 	}
 }
 
-void Zed::inputFunc() {
+void Zed::shootFunc() {
 	bool winding;
 	bool shootReady;
+
+	while (driveRun) {
+		// If left trigger is pressed, and the winch is not wound, start winding it
+		if (this->joystick->GetRawButton(JOY_BTN_LTG) && !winding && !shootReady) {
+			winding = true;
+		}
+
+		// Spin the clutch motor until the limit switch is triggered
+		if (winding && !shootReady) {
+			this->clutchTalon->Set(1.0f);
+			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
+
+			// Stop if limit switch is tripped
+			if (!this->limitSwitch->Get()) {
+				this->lockSolenoid(DoubleSolenoid::kForward);
+				this->clutchTalon->Set(0.f);
+				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+				shootReady = true;
+				winding = false;
+			}
+		}
+
+		// If right trigger is pressed and it is wound, shoot the boulder
+		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady) {
+			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
+		}
+	}
+}
+
+void Zed::inputFunc() {
 
 	while (driveRun) {
 		// If left bumper is pressed, run intake motors in
@@ -141,31 +174,6 @@ void Zed::inputFunc() {
 		} else {
 			rightIntakeTalon->Set(0.f);
 			leftIntakeTalon->Set(0.f);
-		}
-
-		// If left trigger is pressed, and the winch is not wound, start winding it
-		if (this->joystick->GetRawButton(JOY_BTN_LTG) && !winding && !shootReady) {
-			winding = true;
-		}
-
-		// Spin the clutch motor until the limit switch is triggered
-		if (winding && !shootReady) {
-			this->clutchTalon->Set(1.0f);
-			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
-
-			// Stop if limit switch is tripped
-			if (!this->limitSwitch->Get()) {
-				this->lockSolenoid(DoubleSolenoid::kForward);
-				this->clutchTalon->Set(0.f);
-				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
-				shootReady = true;
-				winding = false;
-			}
-		}
-
-		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady) {
-			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 		}
 	}
 }
