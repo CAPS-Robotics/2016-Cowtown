@@ -14,8 +14,7 @@ Zed::Zed() {
 	this->drive = new RobotDrive(DRIVE_FL_TALON, DRIVE_BL_TALON, DRIVE_FR_TALON, DRIVE_BR_TALON);
 	this->joystick = new Joystick(JOY_PORT_0);
 
-	this->leftIntakeTalon = new Talon(LEFT_INTAKE_TALON);
-	this->rightIntakeTalon = new Talon(RIGHT_INTAKE_TALON);
+	this->dropIntakeTalon = new Talon(DROP_INTAKE_TALON);
 	this->intakeTalon = new Talon(INTAKE_TALON);
 	this->clutchTalon= new Talon(CLUTCH_TALON);
 
@@ -31,18 +30,15 @@ Zed::Zed() {
 
 	driveThread = new std::thread(driveFunc);
 	inputThread = new std::thread(inputFunc);
-	shootThread = new std::thread(shootFunc);
 
 	driveThread->detach();
 	inputThread->detach();
-	shootThread->detach();
 }
 
 Zed::~Zed() {
 	delete drive;
 	delete joystick;
-	delete leftIntakeTalon;
-	delete rightIntakeTalon;
+	delete dropIntakeTalon;
 	delete intakeTalon;
 	delete clutchTalon;
 	delete compressor;
@@ -52,7 +48,6 @@ Zed::~Zed() {
 
 	delete driveThread;
 	delete inputThread;
-	delete shootThread;
 }
 
 void Zed::RobotInit() {
@@ -109,9 +104,9 @@ void Zed::driveFunc() {
 	}
 }
 
-void Zed::shootFunc() {
-	bool winding;
-	bool shootReady;
+void Zed::inputFunc() {
+	bool winding = false;
+	bool shootReady = false;
 
 	while (driveRun) {
 		// If left trigger is pressed, and the winch is not wound, start winding it
@@ -121,7 +116,7 @@ void Zed::shootFunc() {
 
 		// Spin the clutch motor until the limit switch is triggered
 		if (winding && !shootReady) {
-			this->clutchTalon->Set(1.0f);
+			this->clutchTalon->Set(0.25f);
 			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
 
 			// Stop if limit switch is tripped
@@ -138,42 +133,33 @@ void Zed::shootFunc() {
 		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady) {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 		}
-	}
-}
 
-void Zed::inputFunc() {
-
-	while (driveRun) {
 		// If left bumper is pressed, run intake motors in
 		if (this->joystick->GetRawButton(JOY_BTN_LBM)) {
-			intakeTalon->Set(1.0f);
+			intakeTalon->Set(0.5f);
 		} else {
 			intakeTalon->Set(0.f);
 		}
 
 		// If right bumper is pressed, run intake motors out
 		if (this->joystick->GetRawButton(JOY_BTN_RBM)) {
-			intakeTalon->Set(-1.0f);
+			intakeTalon->Set(-0.5f);
 		} else {
 			intakeTalon->Set(0.f);
 		}
 
 		// If A button is pressed, drop the intake outside of the frame
 		if (this->joystick->GetRawButton(JOY_BTN_A)) {
-			rightIntakeTalon->Set(-1.0f);
-			leftIntakeTalon->Set(1.0f);
+			dropIntakeTalon->Set(-0.25f);
 		} else {
-			rightIntakeTalon->Set(0.f);
-			leftIntakeTalon->Set(0.f);
+			dropIntakeTalon->Set(0.f);
 		}
 
 		// If B button is pressed, lift the intake into the frame
 		if (this->joystick->GetRawButton(JOY_BTN_B)) {
-			rightIntakeTalon->Set(1.0f);
-			leftIntakeTalon->Set(-1.0f);
+			dropIntakeTalon->Set(0.25f);
 		} else {
-			rightIntakeTalon->Set(0.f);
-			leftIntakeTalon->Set(0.f);
+			dropIntakeTalon->Set(0.f);
 		}
 	}
 }

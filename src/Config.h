@@ -41,18 +41,17 @@
 #define DRIVE_FR_TALON				2
 #define DRIVE_BR_TALON				3
 #define CLUTCH_TALON				4
-#define LEFT_INTAKE_TALON			5
-#define RIGHT_INTAKE_TALON			6
-#define INTAKE_TALON				7
-
-// Solenoids
-#define CLUTCH_SOL_FORWARD			0
-#define CLUTCH_SOL_REVERSE			1
-#define LOCK_SOL_FORWARD			2
-#define LOCK_SOL_REVERSE			3
+#define DROP_INTAKE_TALON			5
+#define INTAKE_TALON				6
 
 // Compressor
 #define COMPRESSOR_PORT				0
+
+// Solenoids
+#define CLUTCH_SOL_FORWARD			1
+#define CLUTCH_SOL_REVERSE			2
+#define LOCK_SOL_FORWARD			3
+#define LOCK_SOL_REVERSE			4
 
 // Digital I/O
 #define LIMIT_SWITCH				0
