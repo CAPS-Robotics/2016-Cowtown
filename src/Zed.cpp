@@ -41,8 +41,9 @@ Zed::Zed() {
 
 	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
 
-	driveThread = new std::thread(driveFunc);
-	inputThread = new std::thread(inputFunc);
+	// This is kinda weird syntax, but it's what I have to do so it's whatever
+	driveThread = new std::thread(&Zed::driveFunc, this);
+	inputThread = new std::thread(&Zed::inputFunc, this);
 
 	driveThread->detach();
 	inputThread->detach();
