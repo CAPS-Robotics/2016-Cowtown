@@ -12,8 +12,11 @@ int sgn(double num) {
 	return num == 0 ? 0 : (num / fabs(num));
 }
 
-float normalize(int joystickValue) {
-	return joystickValue / 128.f;
+float normalize(float joystickValue) {
+	if (fabs(joystickValue) <= 0.1) {
+		return 0.f;
+	}
+	return joystickValue;
 }
 
 
