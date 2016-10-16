@@ -3,6 +3,19 @@
  *
  *  Created on: Sep 12, 2016
  *      Author: Ryan Pope <poperyan73@gmail.com
+ *
+ *  Control Layout:
+ *
+ *      Left Joystick:  Left wheels
+ *      Right Joystick: Right wheels
+ *
+ *      Left Trigger: 	Begin winding up catapult
+ *      Right Trigger: 	Shoot ball once wound up
+ *      Left Bumper: 	Intake pick up ball
+ *      Right Bumper: 	Intake spit out ball
+ *
+ *      A Button:		Drop intake to pick up ball
+ *      B Button: 		Lift intake back into robot
  */
 
 #include <WPILib.h>
@@ -16,7 +29,7 @@ Zed::Zed() {
 
 	this->dropIntakeTalon = new Talon(DROP_INTAKE_TALON);
 	this->intakeTalon = new Talon(INTAKE_TALON);
-	this->clutchTalon= new Talon(CLUTCH_TALON);
+	this->clutchTalon = new Talon(CLUTCH_TALON);
 
 	this->compressor = new Compressor(COMPRESSOR_PORT);
 
@@ -51,22 +64,31 @@ Zed::~Zed() {
 }
 
 void Zed::RobotInit() {
-
+	SmartDashboard::PutString("DB/String 0", "Not Wound");
+	SmartDashboard::PutString("DB/String 5", 0);
 }
 
 void Zed::Autonomous() {
+	int mode = std::stof(SmartDashboard::GetString("DB/String 5", "0"));
 
+	// Basic Auto that drives forward
+	if (mode == 0) {
+		this->drive->TankDrive(0.75f, 0.75f, false);
+		Wait(2.f);
+		this->drive->TankDrive(0.f, 0.f, false);
+		Wait(1.f);
+	}
 }
 
 void Zed::driveFunc() {
 	float Kp = 0.044000;
 	float Ki = 0.000001;
 	float Kd = 0.000001;
-	float lPIDError = 0;
-	float lPIDIntegral = 0;
+	float lPIDError 	= 0;
+	float lPIDIntegral 	= 0;
 	float lCurrentSpeed = 0;
-	float rPIDError = 0;
-	float rPIDIntegral = 0;
+	float rPIDError 	= 0;
+	float rPIDIntegral 	= 0;
 	float rCurrentSpeed = 0;
 	double oldTime = GetTime();
 
@@ -116,22 +138,25 @@ void Zed::inputFunc() {
 
 		// Spin the clutch motor until the limit switch is triggered
 		if (winding && !shootReady) {
-			this->clutchTalon->Set(0.25f);
+			SmartDashboard::PutString("DB/String 0", "Winding");
 			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
+			this->clutchTalon->Set(0.25f);
 
-			// Stop if limit switch is tripped
+			// Stop if limit switch is triggered
 			if (!this->limitSwitch->Get()) {
-				this->lockSolenoid(DoubleSolenoid::kForward);
+				this->lockSolenoid->Set(DoubleSolenoid::kForward);
 				this->clutchTalon->Set(0.f);
 				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+				SmartDashboard::PutString("DB/String 0", "Shooter Ready");
 				shootReady = true;
 				winding = false;
 			}
 		}
 
 		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady) {
+		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady && !winding) {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
+			SmartDashboard::PutString("DB/String 0", "Not Wound");
 		}
 
 		// If left bumper is pressed, run intake motors in
