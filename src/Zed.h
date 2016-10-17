@@ -25,14 +25,14 @@ class Zed : public SampleRobot
 public:
 	RobotDrive *drive;
 	Joystick *joystick;
-	Talon *dropIntakeTalon;
+	/*Talon *dropIntakeTalon;
 	Talon *intakeTalon;
 	Talon *clutchTalon;
 	Compressor *compressor;
 	DoubleSolenoid *clutchSolenoid;
 	DoubleSolenoid *lockSolenoid;
 	DigitalInput *limitSwitch;
-
+*/
 	std::thread * driveThread;
 	std::thread * inputThread;
 	bool driveRun = false;

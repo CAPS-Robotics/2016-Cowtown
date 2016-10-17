@@ -27,7 +27,7 @@ Zed::Zed() {
 	this->drive = new RobotDrive(DRIVE_FL_TALON, DRIVE_BL_TALON, DRIVE_FR_TALON, DRIVE_BR_TALON);
 	this->joystick = new Joystick(JOY_PORT_0);
 
-	this->dropIntakeTalon = new Talon(DROP_INTAKE_TALON);
+	/*this->dropIntakeTalon = new Talon(DROP_INTAKE_TALON);
 	this->intakeTalon = new Talon(INTAKE_TALON);
 	this->clutchTalon = new Talon(CLUTCH_TALON);
 
@@ -40,7 +40,7 @@ Zed::Zed() {
 	this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 
 	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
-
+	*/
 	// This is kinda weird syntax, but it's what I have to do so it's whatever
 	driveThread = new std::thread(&Zed::driveFunc, this);
 	inputThread = new std::thread(&Zed::inputFunc, this);
@@ -52,14 +52,14 @@ Zed::Zed() {
 Zed::~Zed() {
 	delete drive;
 	delete joystick;
-	delete dropIntakeTalon;
+	/*delete dropIntakeTalon;
 	delete intakeTalon;
 	delete clutchTalon;
 	delete compressor;
 	delete clutchSolenoid;
 	delete lockSolenoid;
 	delete limitSwitch;
-
+	*/
 	delete driveThread;
 	delete inputThread;
 }
@@ -70,7 +70,7 @@ void Zed::RobotInit() {
 }
 
 void Zed::Autonomous() {
-	int mode = std::stof(SmartDashboard::GetString("DB/String 5", "0"));
+	int mode = std::stoi(SmartDashboard::GetString("DB/String 5", "0"));
 
 	// Basic Auto that drives forward
 	if (mode == 0) {
@@ -82,7 +82,7 @@ void Zed::Autonomous() {
 }
 
 void Zed::driveFunc() {
-	float Kp = 0.044000;
+	float Kp = 0.033000;
 	float Ki = 0.000001;
 	float Kd = 0.000001;
 	float lPIDError 	= 0;
@@ -128,7 +128,7 @@ void Zed::driveFunc() {
 }
 
 void Zed::inputFunc() {
-	bool winding = false;
+	/*bool winding = false;
 	bool shootReady = false;
 
 	while (driveRun) {
@@ -187,7 +187,7 @@ void Zed::inputFunc() {
 		} else {
 			dropIntakeTalon->Set(0.f);
 		}
-	}
+	}*/
 }
 
 void Zed::OperatorControl() {
