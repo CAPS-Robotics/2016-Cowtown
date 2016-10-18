@@ -41,7 +41,7 @@ public:
 	~Zed();
 
 	void RobotInit();
-	void Disabled() {};
+	void Disabled();
 	void Autonomous();
 	void OperatorControl();
 	void Test() {};

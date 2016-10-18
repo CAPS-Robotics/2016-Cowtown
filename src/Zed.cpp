@@ -65,12 +65,12 @@ Zed::~Zed() {
 }
 
 void Zed::RobotInit() {
-	SmartDashboard::PutString("DB/String 0", "Not Wound");
-	SmartDashboard::PutString("DB/String 5", 0);
+	//SmartDashboard::PutString("DB/String 0", "Not Wound");
+	//SmartDashboard::PutString("DB/String 5", 0);
 }
 
 void Zed::Autonomous() {
-	int mode = std::stoi(SmartDashboard::GetString("DB/String 5", "0"));
+	int mode = 0; // std::stoi(SmartDashboard::GetString("DB/String 5", "0"));
 
 	// Basic Auto that drives forward
 	if (mode == 0) {
@@ -191,9 +191,10 @@ void Zed::inputFunc() {
 }
 
 void Zed::OperatorControl() {
-	while (RobotBase::IsEnabled()) {
-		driveRun = true;
-	}
+	driveRun = true;
+}
+
+void Zed::Disabled() {
 	driveRun = false;
 }
 
