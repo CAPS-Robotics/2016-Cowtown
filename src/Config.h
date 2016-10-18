@@ -28,12 +28,12 @@
 #define JOY_SPC_RST					12 // Push the right stick in
 
 // Joystick axes
-#define JOY_AXIS_LX             	1
-#define JOY_AXIS_LY             	2
-#define JOY_AXIS_RX             	3
-#define JOY_AXIS_RY             	4
-#define JOY_AXIS_DX             	5
-#define JOY_AXIS_DY             	6
+#define JOY_AXIS_LX             	0
+#define JOY_AXIS_LY             	1
+#define JOY_AXIS_RX             	2
+#define JOY_AXIS_RY             	3
+#define JOY_AXIS_DX             	4
+#define JOY_AXIS_DY             	5
 
 // Talons
 #define DRIVE_FL_TALON				0
@@ -55,5 +55,8 @@
 
 // Digital I/O
 #define LIMIT_SWITCH				0
+
+// Variable
+#define SCALE_FACTOR				0.5
 
 #endif /* SRC_CONFIG_H_ */

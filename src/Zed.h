@@ -13,10 +13,10 @@ int sgn(double num) {
 }
 
 float normalize(float joystickValue) {
-	if (fabs(joystickValue) <= 0.1) {
+	/*if (fabs(joystickValue) <= 0.1) {
 		return 0.f;
-	}
-	return joystickValue;
+	}*/
+	return -joystickValue;
 }
 
 
@@ -32,22 +32,17 @@ public:
 	DoubleSolenoid *clutchSolenoid;
 	DoubleSolenoid *lockSolenoid;
 	DigitalInput *limitSwitch;
-*/
-	std::thread * driveThread;
-	std::thread * inputThread;
-	bool driveRun = false;
+	 */
 
 	Zed();
 	~Zed();
 
 	void RobotInit();
-	void Disabled();
+	void Disabled() {};
 	void Autonomous();
 	void OperatorControl();
 	void Test() {};
 
-	void driveFunc();
-	void inputFunc();
 };
 
 

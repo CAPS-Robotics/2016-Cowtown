@@ -41,12 +41,6 @@ Zed::Zed() {
 
 	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
 	*/
-	// This is kinda weird syntax, but it's what I have to do so it's whatever
-	driveThread = new std::thread(&Zed::driveFunc, this);
-	inputThread = new std::thread(&Zed::inputFunc, this);
-
-	driveThread->detach();
-	inputThread->detach();
 }
 
 Zed::~Zed() {
@@ -60,8 +54,6 @@ Zed::~Zed() {
 	delete lockSolenoid;
 	delete limitSwitch;
 	*/
-	delete driveThread;
-	delete inputThread;
 }
 
 void Zed::RobotInit() {
@@ -81,10 +73,10 @@ void Zed::Autonomous() {
 	}
 }
 
-void Zed::driveFunc() {
-	float Kp = 0.033000;
-	float Ki = 0.000001;
-	float Kd = 0.000001;
+void Zed::OperatorControl() {
+	float Kp 			= 0.001300;
+	float Ki 			= 0.000001;
+	float Kd 			= 0.000001;
 	float lPIDError 	= 0;
 	float lPIDIntegral 	= 0;
 	float lCurrentSpeed = 0;
@@ -93,7 +85,7 @@ void Zed::driveFunc() {
 	float rCurrentSpeed = 0;
 	double oldTime = GetTime();
 
-	while (driveRun) {
+	while (RobotBase::IsEnabled()) {
 		double currentTime = GetTime();
 		// Left wheel PID loop
 		// Sets the current error of the speed from the desired speed
@@ -123,79 +115,9 @@ void Zed::driveFunc() {
 		oldTime = currentTime;
 
 		// Drive the robot using the PID corrected speeds
-		drive->TankDrive(lCurrentSpeed, rCurrentSpeed);
+		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, rCurrentSpeed * SCALE_FACTOR, false);
 	}
 }
 
-void Zed::inputFunc() {
-	/*bool winding = false;
-	bool shootReady = false;
-
-	while (driveRun) {
-		// If left trigger is pressed, and the winch is not wound, start winding it
-		if (this->joystick->GetRawButton(JOY_BTN_LTG) && !winding && !shootReady) {
-			winding = true;
-		}
-
-		// Spin the clutch motor until the limit switch is triggered
-		if (winding && !shootReady) {
-			SmartDashboard::PutString("DB/String 0", "Winding");
-			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
-			this->clutchTalon->Set(0.25f);
-
-			// Stop if limit switch is triggered
-			if (!this->limitSwitch->Get()) {
-				this->lockSolenoid->Set(DoubleSolenoid::kForward);
-				this->clutchTalon->Set(0.f);
-				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
-				SmartDashboard::PutString("DB/String 0", "Shooter Ready");
-				shootReady = true;
-				winding = false;
-			}
-		}
-
-		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady && !winding) {
-			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
-			SmartDashboard::PutString("DB/String 0", "Not Wound");
-		}
-
-		// If left bumper is pressed, run intake motors in
-		if (this->joystick->GetRawButton(JOY_BTN_LBM)) {
-			intakeTalon->Set(0.5f);
-		} else {
-			intakeTalon->Set(0.f);
-		}
-
-		// If right bumper is pressed, run intake motors out
-		if (this->joystick->GetRawButton(JOY_BTN_RBM)) {
-			intakeTalon->Set(-0.5f);
-		} else {
-			intakeTalon->Set(0.f);
-		}
-
-		// If A button is pressed, drop the intake outside of the frame
-		if (this->joystick->GetRawButton(JOY_BTN_A)) {
-			dropIntakeTalon->Set(-0.25f);
-		} else {
-			dropIntakeTalon->Set(0.f);
-		}
-
-		// If B button is pressed, lift the intake into the frame
-		if (this->joystick->GetRawButton(JOY_BTN_B)) {
-			dropIntakeTalon->Set(0.25f);
-		} else {
-			dropIntakeTalon->Set(0.f);
-		}
-	}*/
-}
-
-void Zed::OperatorControl() {
-	driveRun = true;
-}
-
-void Zed::Disabled() {
-	driveRun = false;
-}
 
 START_ROBOT_CLASS(Zed);
