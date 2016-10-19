@@ -36,13 +36,15 @@
 #define JOY_AXIS_DY             	5
 
 // Talons
-#define DRIVE_FL_TALON				0
-#define DRIVE_BL_TALON				1
-#define DRIVE_FR_TALON				2
-#define DRIVE_BR_TALON				3
-#define CLUTCH_TALON				4
-#define DROP_INTAKE_TALON			5
-#define INTAKE_TALON				6
+#define DRIVE_FL_TALON				4
+#define DRIVE_BL_TALON				5
+#define DRIVE_FR_TALON				6
+#define DRIVE_BR_TALON				7
+
+// CAN Talon SRXs
+#define DROP_INTAKE_CAN_TALON		3
+#define INTAKE_CAN_TALON			5
+#define CLUTCH_CAN_TALON			2
 
 // Compressor
 #define COMPRESSOR_PORT				0
@@ -57,6 +59,6 @@
 #define LIMIT_SWITCH				0
 
 // Variable
-#define SCALE_FACTOR				0.5
+#define SCALE_FACTOR				1
 
 #endif /* SRC_CONFIG_H_ */

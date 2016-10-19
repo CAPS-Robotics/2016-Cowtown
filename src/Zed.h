@@ -13,9 +13,9 @@ int sgn(double num) {
 }
 
 float normalize(float joystickValue) {
-	/*if (fabs(joystickValue) <= 0.1) {
+	if (fabs(joystickValue) <= 0.05) {
 		return 0.f;
-	}*/
+	}
 	return -joystickValue;
 }
 
@@ -25,14 +25,13 @@ class Zed : public SampleRobot
 public:
 	RobotDrive *drive;
 	Joystick *joystick;
-	/*Talon *dropIntakeTalon;
-	Talon *intakeTalon;
-	Talon *clutchTalon;
-	Compressor *compressor;
+	CANTalon *dropIntakeCanTalon;
+	CANTalon *intakeCanTalon;
+	CANTalon *clutchCanTalon;
+	/*Compressor *compressor;
 	DoubleSolenoid *clutchSolenoid;
 	DoubleSolenoid *lockSolenoid;
-	DigitalInput *limitSwitch;
-	 */
+	DigitalInput *limitSwitch;*/
 
 	Zed();
 	~Zed();
