@@ -28,10 +28,10 @@ public:
 	CANTalon *dropIntakeCanTalon;
 	CANTalon *intakeCanTalon;
 	CANTalon *clutchCanTalon;
-	/*Compressor *compressor;
-	DoubleSolenoid *clutchSolenoid;
-	DoubleSolenoid *lockSolenoid;
-	DigitalInput *limitSwitch;*/
+	Compressor *compressor;
+//	DoubleSolenoid *clutchSolenoid;
+//	DoubleSolenoid *lockSolenoid;
+//	DigitalInput *limitSwitch;
 
 	Zed();
 	~Zed();

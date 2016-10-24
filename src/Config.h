@@ -42,9 +42,11 @@
 #define DRIVE_BR_TALON				7
 
 // CAN Talon SRXs
-#define DROP_INTAKE_CAN_TALON		3
-#define INTAKE_CAN_TALON			5
+#define PDP_CAN						0
+#define INTAKE_CAN_TALON			1
 #define CLUTCH_CAN_TALON			2
+#define PCM_CAN						3
+#define DROP_INTAKE_CAN_TALON		4
 
 // Compressor
 #define COMPRESSOR_PORT				0
