@@ -5,6 +5,8 @@
  *      Author: Ryan Pope <poperyan73@gmail.com
  */
 
+#include <MMRJoystick.h>
+
 #ifndef SRC_ZED_H_
 #define SRC_ZED_H_
 
@@ -24,14 +26,13 @@ class Zed : public SampleRobot
 {
 public:
 	RobotDrive *drive;
-	Joystick *joystick;
+	MMRJoystick *joystick;
 	CANTalon *dropIntakeCanTalon;
 	CANTalon *intakeCanTalon;
 	CANTalon *clutchCanTalon;
 	Compressor *compressor;
-//	DoubleSolenoid *clutchSolenoid;
-//	DoubleSolenoid *lockSolenoid;
-//	DigitalInput *limitSwitch;
+	DoubleSolenoid *clutchSolenoid;
+	DoubleSolenoid *lockSolenoid;
 
 	Zed();
 	~Zed();

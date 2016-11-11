@@ -52,10 +52,10 @@
 #define COMPRESSOR_PORT				0
 
 // Solenoids
-#define CLUTCH_SOL_FORWARD			1
-#define CLUTCH_SOL_REVERSE			2
-#define LOCK_SOL_FORWARD			3
-#define LOCK_SOL_REVERSE			4
+#define CLUTCH_SOL_FORWARD			4
+#define CLUTCH_SOL_REVERSE			5
+#define LOCK_SOL_FORWARD			6
+#define LOCK_SOL_REVERSE			7
 
 // Digital I/O
 #define LIMIT_SWITCH				0

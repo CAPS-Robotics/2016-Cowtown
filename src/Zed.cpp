@@ -26,21 +26,19 @@
 
 Zed::Zed() {
 	this->drive = new RobotDrive(DRIVE_FL_TALON, DRIVE_BL_TALON, DRIVE_FR_TALON, DRIVE_BR_TALON);
-	this->joystick = new Joystick(JOY_PORT_0);
+	this->joystick = new MMRJoystick(JOY_PORT_0);
 
 	this->dropIntakeCanTalon = new CANTalon(DROP_INTAKE_CAN_TALON);
 	this->intakeCanTalon = new CANTalon(INTAKE_CAN_TALON);
 	this->clutchCanTalon = new CANTalon(CLUTCH_CAN_TALON);
 
-//	this->compressor = new Compressor(COMPRESSOR_PORT);
+	this->compressor = new Compressor(COMPRESSOR_PORT);
 
-//	this->clutchSolenoid = new DoubleSolenoid(CLUTCH_SOL_FORWARD, CLUTCH_SOL_REVERSE);
-//	this->lockSolenoid = new DoubleSolenoid(LOCK_SOL_FORWARD, LOCK_SOL_REVERSE);
+	this->clutchSolenoid = new DoubleSolenoid(CLUTCH_SOL_FORWARD, CLUTCH_SOL_REVERSE);
+	this->lockSolenoid = new DoubleSolenoid(LOCK_SOL_FORWARD, LOCK_SOL_REVERSE);
 
-//	this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
-//	this->lockSolenoid->Set(DoubleSolenoid::kReverse);
-
-//	this->limitSwitch = new DigitalInput(LIMIT_SWITCH);
+	this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+	this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
 Zed::~Zed() {
@@ -49,10 +47,9 @@ Zed::~Zed() {
 	delete dropIntakeCanTalon;
 	delete intakeCanTalon;
 	delete clutchCanTalon;
-	//delete compressor;
-	/*delete clutchSolenoid;
+	delete compressor;
+	delete clutchSolenoid;
 	delete lockSolenoid;
-	delete limitSwitch;*/
 }
 
 void Zed::RobotInit() {
@@ -70,13 +67,13 @@ void Zed::RobotInit() {
 	this->clutchCanTalon->SetSensorDirection(false);
 	this->clutchCanTalon->SetClosedLoopOutputDirection(false);
 
-	//this->compressor->SetClosedLoopControl(true);
+	this->compressor->SetClosedLoopControl(false);
 
 	this->drive->SetSafetyEnabled(false);
 }
 
 void Zed::Autonomous() {
-	int mode = 0; // std::stoi(SmartDashboard::GetString("DB/String 5", "0"));
+	int mode = 1; // std::stoi(SmartDashboard::GetString("DB/String 5", "0"));
 
 	// Basic Auto that drives forward
 	if (mode == 0) {
@@ -85,7 +82,7 @@ void Zed::Autonomous() {
 		this->drive->TankDrive(0.f, 0.f, false);
 		Wait(1.f);
 	} else if (mode == 1) {
-
+		this->compressor->Start();
 	}
 }
 
@@ -101,14 +98,14 @@ void Zed::OperatorControl() {
 	float rCurrentSpeed = 0;
 	double oldTime = GetTime();
 
-//	bool winding = false;
-//	bool shootReady = false;
+	bool winding = false;
+	bool shootReady = false;
 
 	while (RobotBase::IsEnabled()) {
 		double currentTime = GetTime();
 		// Left wheel PID loop
 		// Sets the current error of the speed from the desired speed
-		float lCurrentError = normalize(this->joystick->GetRawAxis(JOY_AXIS_LY)) - lCurrentSpeed;
+		float lCurrentError = -this->joystick->GetLeftY() - lCurrentSpeed;
 		// Integrate to estimate the past error
 		lPIDIntegral += lPIDError * (currentTime - oldTime);
 		// Differentiate to estimate future error
@@ -120,7 +117,7 @@ void Zed::OperatorControl() {
 
 		// Right wheel PID loop
 		// Sets the current error of the speed from the desired speed
-		float rCurrentError = normalize(this->joystick->GetRawAxis(JOY_AXIS_RY)) - rCurrentSpeed;
+		float rCurrentError = this->joystick->GetRightY() - rCurrentSpeed;
 		// Integrate to estimate the past error
 		rPIDIntegral += rPIDError * (currentTime - oldTime);
 		// Differentiate to estimate future error
@@ -137,14 +134,15 @@ void Zed::OperatorControl() {
 		// Drifts to the right so slow down the right motors
 		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, rCurrentSpeed * SCALE_FACTOR * 0.9, false);
 
-		if (this->joystick->GetRawButton(JOY_BTN_LTG)) {
+		if (this->joystick->IsLeftTriggerPressed()) {
 			this->clutchCanTalon->Set(0.75f);
 		} else {
 			this->clutchCanTalon->Set(0.f);
 		}
 
+
 		// If left trigger is pressed, and the winch is not wound, start winding it
-		/*if (this->joystick->GetRawButton(JOY_BTN_LTG) && !winding && !shootReady) {
+		if (this->joystick->IsLeftTriggerPressed() && !winding && !shootReady) {
 			winding = true;
 		}
 
@@ -154,7 +152,7 @@ void Zed::OperatorControl() {
 			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
 			this->clutchCanTalon->Set(0.15f);
 			// Stop if Y is pressed
-			if (this->joystick->GetRawButton(JOY_BTN_Y)) {
+			if (this->joystick->IsYPressed()) {
 				this->lockSolenoid->Set(DoubleSolenoid::kForward);
 				this->clutchCanTalon->Set(0.f);
 				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
@@ -165,34 +163,35 @@ void Zed::OperatorControl() {
 		}
 
 		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->GetRawButton(JOY_BTN_RTG) && shootReady && !winding) {
+		if (this->joystick->IsRightTriggerPressed() && shootReady && !winding) {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 			SmartDashboard::PutString("DB/String 0", "Not Wound");
-		}*/
+		}
+
 
 		// If left bumper is pressed, run intake motors in
-		if (this->joystick->GetRawButton(JOY_BTN_LBM)) {
-			intakeCanTalon->Set(-0.5f);
+		if (this->joystick->IsLeftBumperPressed()) {
+			intakeCanTalon->Set(-1.0f);
 		} else {
 			intakeCanTalon->Set(0.f);
 		}
 
 		// If right bumper is pressed, run intake motors out
-		if (this->joystick->GetRawButton(JOY_BTN_RBM)) {
-			intakeCanTalon->Set(-0.5f);
+		if (this->joystick->IsRightBumperPressed()) {
+			intakeCanTalon->Set(1.0f);
 		} else {
 			intakeCanTalon->Set(0.f);
 		}
 
 		// If A button is pressed, drop the intake outside of the frame
-		if (this->joystick->GetRawButton(JOY_BTN_A)) {
-			dropIntakeCanTalon->Set(-0.75f);
+		if (this->joystick->IsAPressed()) {
+			dropIntakeCanTalon->Set(-1.f);
 		} else {
 			dropIntakeCanTalon->Set(0.f);
 		}
 
 		// If B button is pressed, lift the intake into the frame
-		if (this->joystick->GetRawButton(JOY_BTN_B)) {
+		if (this->joystick->IsBPressed()) {
 			dropIntakeCanTalon->Set(0.75f);
 		} else {
 			dropIntakeCanTalon->Set(0.f);
