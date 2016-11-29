@@ -21,16 +21,19 @@
 
 #include <WPILib.h>
 #include <Config.h>
+#include <MMRDashboard.h>
 #include <thread>
 #include <Zed.h>
 
 Zed::Zed() {
 	this->drive = new RobotDrive(DRIVE_FL_TALON, DRIVE_BL_TALON, DRIVE_FR_TALON, DRIVE_BR_TALON);
 	this->joystick = new MMRJoystick(JOY_PORT_0);
+	///this->joystick = new Joystick(JOY_PORT_1);
 
 	this->dropIntakeCanTalon = new CANTalon(DROP_INTAKE_CAN_TALON);
 	this->intakeCanTalon = new CANTalon(INTAKE_CAN_TALON);
 	this->clutchCanTalon = new CANTalon(CLUTCH_CAN_TALON);
+
 
 	this->compressor = new Compressor(COMPRESSOR_PORT);
 
@@ -67,7 +70,7 @@ void Zed::RobotInit() {
 	this->clutchCanTalon->SetSensorDirection(false);
 	this->clutchCanTalon->SetClosedLoopOutputDirection(false);
 
-	this->compressor->SetClosedLoopControl(false);
+	this->compressor->SetClosedLoopControl(true);
 
 	this->drive->SetSafetyEnabled(false);
 }
@@ -83,6 +86,12 @@ void Zed::Autonomous() {
 		Wait(1.f);
 	} else if (mode == 1) {
 		this->compressor->Start();
+		while (true) {
+			MMRDashboard::PutTextboxValue(1, this->compressor->GetPressureSwitchValue());
+			MMRDashboard::PutTextboxValue(2, this->compressor->GetCompressorCurrent());
+		}
+	} else {
+
 	}
 }
 
@@ -97,11 +106,17 @@ void Zed::OperatorControl() {
 	float rPIDIntegral 	= 0;
 	float rCurrentSpeed = 0;
 	double oldTime = GetTime();
-
-	bool winding = false;
-	bool shootReady = false;
+	int multiplier = 1;
 
 	while (RobotBase::IsEnabled()) {
+		if (this->joystick->IsStartPressed()) {
+			if (multiplier == 1) {
+				multiplier = -1;
+			} else {
+				multiplier = 1;
+			}
+		}
+
 		double currentTime = GetTime();
 		// Left wheel PID loop
 		// Sets the current error of the speed from the desired speed
@@ -132,46 +147,59 @@ void Zed::OperatorControl() {
 
 		// Drive the robot using the PID corrected speeds
 		// Drifts to the right so slow down the right motors
-		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, rCurrentSpeed * SCALE_FACTOR * 0.9, false);
+		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, -rCurrentSpeed * SCALE_FACTOR * 0.9, false);
 
 		if (this->joystick->IsLeftTriggerPressed()) {
-			this->clutchCanTalon->Set(0.75f);
+			this->clutchCanTalon->Set(multiplier * 0.85f);
 		} else {
 			this->clutchCanTalon->Set(0.f);
 		}
 
+		if (this->joystick->IsXPressed()) {
+			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
+		}
 
-		// If left trigger is pressed, and the winch is not wound, start winding it
-		if (this->joystick->IsLeftTriggerPressed() && !winding && !shootReady) {
-			winding = true;
+		if (this->joystick->IsBackPressed()) {
+			this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+		}
+
+		if (this->joystick->IsYPressed()) {
+			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
+			Wait(0.5f);
+			this->clutchCanTalon->Set(0.f);
+			Wait(0.75f);
+			this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+			SmartDashboard::PutString("DB/String 0", "Shooter Ready");
 		}
 
 		// Spin the clutch motor until the limit switch is triggered
-		if (winding && !shootReady) {
+/*		if (winding && !shootReady) {
 			SmartDashboard::PutString("DB/String 0", "Winding");
-			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
-			this->clutchCanTalon->Set(0.15f);
+//			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
+			this->clutchCanTalon->Set(0.3f);
 			// Stop if Y is pressed
 			if (this->joystick->IsYPressed()) {
-				this->lockSolenoid->Set(DoubleSolenoid::kForward);
+//				this->lockSolenoid->Set(DoubleSolenoid::kForward);
 				this->clutchCanTalon->Set(0.f);
-				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
+//				this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
 				SmartDashboard::PutString("DB/String 0", "Shooter Ready");
 				shootReady = true;
 				winding = false;
 			}
-		}
+		}*/
 
 		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->IsRightTriggerPressed() && shootReady && !winding) {
-			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
-			SmartDashboard::PutString("DB/String 0", "Not Wound");
+		if (this->joystick->IsRightTriggerPressed()) {
+			this->lockSolenoid->Set(DoubleSolenoid::kForward);
+			SmartDashboard::PutString("DB/String 0", "Fired");
 		}
 
 
 		// If left bumper is pressed, run intake motors in
 		if (this->joystick->IsLeftBumperPressed()) {
 			intakeCanTalon->Set(-1.0f);
+			Wait(0.02f);
+			SmartDashboard::PutString("DB/String 0", "Winding");
 		} else {
 			intakeCanTalon->Set(0.f);
 		}
@@ -179,20 +207,24 @@ void Zed::OperatorControl() {
 		// If right bumper is pressed, run intake motors out
 		if (this->joystick->IsRightBumperPressed()) {
 			intakeCanTalon->Set(1.0f);
+			Wait(0.02f);
 		} else {
 			intakeCanTalon->Set(0.f);
 		}
 
+		MMRDashboard::PutTextboxValue(1, dropIntakeCanTalon->Get());
+
 		// If A button is pressed, drop the intake outside of the frame
 		if (this->joystick->IsAPressed()) {
-			dropIntakeCanTalon->Set(-1.f);
+			dropIntakeCanTalon->Set(1.f);
+			Wait(.25f);
 		} else {
 			dropIntakeCanTalon->Set(0.f);
 		}
 
 		// If B button is pressed, lift the intake into the frame
 		if (this->joystick->IsBPressed()) {
-			dropIntakeCanTalon->Set(0.75f);
+			dropIntakeCanTalon->Set(-0.75f);
 		} else {
 			dropIntakeCanTalon->Set(0.f);
 		}

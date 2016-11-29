@@ -12,6 +12,14 @@ void MMRDashboard::PutTextboxValue(int id, std::string value) {
 	SmartDashboard::PutString("DB/String " + std::to_string(id), value);
 }
 
+void MMRDashboard::PutTextboxValue(int id, double value) {
+	SmartDashboard::PutString("DB/String " + std::to_string(id), std::to_string(value));
+}
+
+void MMRDashboard::PutTextboxValue(int id, int value) {
+	SmartDashboard::PutString("DB/String " + std::to_string(id), std::to_string(value));
+}
+
 void MMRDashboard::PutSliderValue(int id, float value) {
 	SmartDashboard::PutNumber("DB/Slider " + std::to_string(id), value);
 }
@@ -25,15 +33,15 @@ void MMRDashboard::TurnLedOff(int id) {
 }
 
 std::string MMRDashboard::GetTextboxValue(int id, std::string def) {
-	MMRDashboard::GetString("DB/String " + std::to_string(id), def);
+	return MMRDashboard::GetString("DB/String " + std::to_string(id), def);
 }
 
 float MMRDashboard::GetSliderValue(int id, float def) {
-	MMRDashboard::GetNumber("DB/Slider " + std::to_string(id), def);
+	return MMRDashboard::GetNumber("DB/Slider " + std::to_string(id), def);
 }
 
 bool MMRDashboard::GetLedValue(int id, bool def) {
-	MMRDashboard::GetBoolean("DB/LED " + std::to_string(id), def);
+	return MMRDashboard::GetBoolean("DB/LED " + std::to_string(id), def);
 }
 
 void MMRDashboard::ToggleLed(int id) {

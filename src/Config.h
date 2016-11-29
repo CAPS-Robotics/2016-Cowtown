@@ -10,6 +10,7 @@
 
 // Joystick port
 #define JOY_PORT_0					0
+#define JOY_PORT_1					1
 
 // Joystick buttons
 #define JOY_BTN_X					1
@@ -36,10 +37,10 @@
 #define JOY_AXIS_DY             	5
 
 // Talons
-#define DRIVE_FL_TALON				4
-#define DRIVE_BL_TALON				5
-#define DRIVE_FR_TALON				6
-#define DRIVE_BR_TALON				7
+#define DRIVE_FL_TALON				7
+#define DRIVE_BL_TALON				6
+#define DRIVE_FR_TALON				5
+#define DRIVE_BR_TALON				4
 
 // CAN Talon SRXs
 #define PDP_CAN						0
@@ -52,10 +53,10 @@
 #define COMPRESSOR_PORT				0
 
 // Solenoids
-#define CLUTCH_SOL_FORWARD			4
-#define CLUTCH_SOL_REVERSE			5
-#define LOCK_SOL_FORWARD			6
-#define LOCK_SOL_REVERSE			7
+#define CLUTCH_SOL_FORWARD			2
+#define CLUTCH_SOL_REVERSE			3
+#define LOCK_SOL_FORWARD			0
+#define LOCK_SOL_REVERSE			1
 
 // Digital I/O
 #define LIMIT_SWITCH				0

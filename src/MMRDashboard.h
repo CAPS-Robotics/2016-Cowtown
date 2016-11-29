@@ -15,6 +15,8 @@
 class MMRDashboard : public SmartDashboard {
 public:
 	static void PutTextboxValue(int id, std::string value);
+	static void PutTextboxValue(int id, double value);
+	static void PutTextboxValue(int id, int value);
 	static void PutSliderValue(int id, float value);
 	static void TurnLedOn(int id);
 	static void TurnLedOff(int id);

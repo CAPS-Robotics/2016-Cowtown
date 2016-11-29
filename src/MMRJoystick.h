@@ -15,9 +15,10 @@ class MMRJoystick : public Joystick {
 private:
 	double deadzone;
 	float Normalize(float value);
+	bool isXMode;
 
 public:
-	MMRJoystick(uint32_t port, double deadzone = 0.05);
+	MMRJoystick(uint32_t port, bool isXMode = false, double deadzone = 0.05);
 	virtual ~MMRJoystick();
 
 	double GetDeadzone();
@@ -41,7 +42,7 @@ public:
 	float GetRightX();
 	float GetRightY();
 
-	enum Buttons : uint32_t {
+	enum DButtons : uint32_t {
 		JoyBtnX = 1,
 		JoyBtnA,
 		JoyBtnB,
@@ -56,12 +57,34 @@ public:
 		JoyBtnRStick
 	};
 
-	enum Axes : uint32_t {
+//	enum class XButtons : uint32_t {
+//		JoyBtnX = 1,
+//		JoyBtnA,
+//		JoyBtnB,
+//		JoyBtnY,
+//		JoyBtnLBumper,
+//		JoyBtnRBumper,
+//		JoyBtnBack,
+//		JoyBtnStart,
+//		JoyBtnLStick,
+//		JoyBtnRStick
+//	};
+
+	enum DAxes : uint32_t {
 		JoyAxisLX = 0,
 		JoyAxisLY,
 		JoyAxisRX,
 		JoyAxisRY
 	};
+
+//	enum class XAxes : uint32_t {
+//		JoyAxisLX = 0,
+//		JoyAxisLY,
+//		JoyAxisLTrigger,
+//		JoyAxisRTrigger,
+//		JoyAxisRX,
+//		JoyAxisRY
+//	};
 };
 
 #endif /* SRC_MMRJOYSTICK_H_ */

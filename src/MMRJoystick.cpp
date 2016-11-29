@@ -7,8 +7,9 @@
 
 #include <MMRJoystick.h>
 
-MMRJoystick::MMRJoystick(uint32_t port, double deadzone) : Joystick(port) {
+MMRJoystick::MMRJoystick(uint32_t port, bool isXMode, double deadzone) : Joystick(port) {
 	this->deadzone = deadzone;
+	this->isXMode = isXMode;
 }
 
 MMRJoystick::~MMRJoystick() {
@@ -27,65 +28,65 @@ double MMRJoystick::GetDeadzone() {
 }
 
 bool MMRJoystick::IsAPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnA);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnA);
 }
 
 bool MMRJoystick::IsBPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnB);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnB);
 }
 
 bool MMRJoystick::IsXPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnX);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnX);
 }
 
 bool MMRJoystick::IsYPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnY);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnY);
 }
 
 bool MMRJoystick::IsLeftBumperPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnLBumper);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnLBumper);
 }
 
 bool MMRJoystick::IsRightBumperPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnRBumper);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnRBumper);
 }
 
 bool MMRJoystick::IsLeftTriggerPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnLTrigger);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnLTrigger);
 }
 
 bool MMRJoystick::IsRightTriggerPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnRTrigger);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnRTrigger);
 }
 
 bool MMRJoystick::IsBackPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnBack);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnBack);
 }
 
 bool MMRJoystick::IsStartPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnStart);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnStart);
 }
 
 bool MMRJoystick::IsLeftJoystickPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnLStick);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnLStick);
 }
 
 bool MMRJoystick::IsRightJoystickPressed() {
-	return Joystick::GetRawButton(MMRJoystick::Buttons::JoyBtnRStick);
+	return Joystick::GetRawButton(MMRJoystick::DButtons::JoyBtnRStick);
 }
 
 float MMRJoystick::GetLeftX() {
-	return Joystick::GetRawAxis(MMRJoystick::Axes::JoyAxisLX);
+	return Joystick::GetRawAxis(MMRJoystick::DAxes::JoyAxisLX);
 }
 
 float MMRJoystick::GetLeftY() {
-	return Joystick::GetRawAxis(MMRJoystick::Axes::JoyAxisLY);
+	return Joystick::GetRawAxis(MMRJoystick::DAxes::JoyAxisLY);
 }
 
 float MMRJoystick::GetRightX() {
-	return Joystick::GetRawAxis(MMRJoystick::Axes::JoyAxisRX);
+	return Joystick::GetRawAxis(MMRJoystick::DAxes::JoyAxisRX);
 }
 
 float MMRJoystick::GetRightY() {
-	return Joystick::GetRawAxis(MMRJoystick::Axes::JoyAxisRY);
+	return Joystick::GetRawAxis(MMRJoystick::DAxes::JoyAxisRY);
 }
