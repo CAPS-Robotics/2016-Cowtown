@@ -28,7 +28,7 @@
 Zed::Zed() {
 	this->drive = new RobotDrive(DRIVE_FL_TALON, DRIVE_BL_TALON, DRIVE_FR_TALON, DRIVE_BR_TALON);
 	this->joystick = new MMRJoystick(JOY_PORT_0);
-	///this->joystick = new Joystick(JOY_PORT_1);
+	this->joystick2 = new Joystick(JOY_PORT_1);
 
 	this->dropIntakeCanTalon = new CANTalon(DROP_INTAKE_CAN_TALON);
 	this->intakeCanTalon = new CANTalon(INTAKE_CAN_TALON);
@@ -120,7 +120,8 @@ void Zed::OperatorControl() {
 		double currentTime = GetTime();
 		// Left wheel PID loop
 		// Sets the current error of the speed from the desired speed
-		float lCurrentError = -this->joystick->GetLeftY() - lCurrentSpeed;
+		float lCurrentError = this->joystick2->GetRawAxis(1) - lCurrentSpeed;
+//		float lCurrentError = this->joystick->GetLeftY() - lCurrentSpeed;
 		// Integrate to estimate the past error
 		lPIDIntegral += lPIDError * (currentTime - oldTime);
 		// Differentiate to estimate future error
@@ -132,7 +133,8 @@ void Zed::OperatorControl() {
 
 		// Right wheel PID loop
 		// Sets the current error of the speed from the desired speed
-		float rCurrentError = this->joystick->GetRightY() - rCurrentSpeed;
+//		float rCurrentError = this->joystick->GetRightY() - rCurrentSpeed;
+		float rCurrentError = this->joystick2->GetRawAxis(0) - rCurrentSpeed;
 		// Integrate to estimate the past error
 		rPIDIntegral += rPIDError * (currentTime - oldTime);
 		// Differentiate to estimate future error
@@ -147,23 +149,28 @@ void Zed::OperatorControl() {
 
 		// Drive the robot using the PID corrected speeds
 		// Drifts to the right so slow down the right motors
-		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, -rCurrentSpeed * SCALE_FACTOR * 0.9, false);
+//		drive->TankDrive(lCurrentSpeed * SCALE_FACTOR, -rCurrentSpeed * SCALE_FACTOR * 0.9);
+		drive->ArcadeDrive(lCurrentSpeed * SCALE_FACTOR, -rCurrentSpeed * SCALE_FACTOR);
 
-		if (this->joystick->IsLeftTriggerPressed()) {
+//		if (this->joystick->IsLeftTriggerPressed()) {
+		if (this->joystick2->GetPOV() >= 0) {
 			this->clutchCanTalon->Set(multiplier * 0.85f);
 		} else {
 			this->clutchCanTalon->Set(0.f);
 		}
 
-		if (this->joystick->IsXPressed()) {
+//		if (this->joystick->IsXPressed()) {
+		if (this->joystick2->GetRawButton(4)) {
 			this->clutchSolenoid->Set(DoubleSolenoid::kForward);
 		}
 
-		if (this->joystick->IsBackPressed()) {
+//		if (this->joystick->IsBackPressed()) {
+		if (this->joystick2->GetRawButton(8)) {
 			this->clutchSolenoid->Set(DoubleSolenoid::kReverse);
 		}
 
-		if (this->joystick->IsYPressed()) {
+//		if (this->joystick->IsYPressed()) {
+		if (this->joystick2->GetRawButton(3)) {
 			this->lockSolenoid->Set(DoubleSolenoid::kReverse);
 			Wait(0.5f);
 			this->clutchCanTalon->Set(0.f);
@@ -189,14 +196,17 @@ void Zed::OperatorControl() {
 		}*/
 
 		// If right trigger is pressed and it is wound, shoot the boulder
-		if (this->joystick->IsRightTriggerPressed()) {
+
+//		if (this->joystick->IsRightTriggerPressed()) {
+		if (this->joystick2->GetRawButton(2)) {
 			this->lockSolenoid->Set(DoubleSolenoid::kForward);
 			SmartDashboard::PutString("DB/String 0", "Fired");
 		}
 
 
 		// If left bumper is pressed, run intake motors in
-		if (this->joystick->IsLeftBumperPressed()) {
+//		if (this->joystick->IsLeftBumperPressed()) {
+		if (this->joystick2->GetRawButton(1)) {
 			intakeCanTalon->Set(-1.0f);
 			Wait(0.02f);
 			SmartDashboard::PutString("DB/String 0", "Winding");
@@ -205,7 +215,8 @@ void Zed::OperatorControl() {
 		}
 
 		// If right bumper is pressed, run intake motors out
-		if (this->joystick->IsRightBumperPressed()) {
+//		if (this->joystick->IsRightBumperPressed()) {
+		if (this->joystick2->GetRawButton(7)) {
 			intakeCanTalon->Set(1.0f);
 			Wait(0.02f);
 		} else {
@@ -215,7 +226,8 @@ void Zed::OperatorControl() {
 		MMRDashboard::PutTextboxValue(1, dropIntakeCanTalon->Get());
 
 		// If A button is pressed, drop the intake outside of the frame
-		if (this->joystick->IsAPressed()) {
+//		if (this->joystick->IsAPressed()) {
+		if (this->joystick2->GetRawButton(6)) {
 			dropIntakeCanTalon->Set(1.f);
 			Wait(.25f);
 		} else {
@@ -223,7 +235,8 @@ void Zed::OperatorControl() {
 		}
 
 		// If B button is pressed, lift the intake into the frame
-		if (this->joystick->IsBPressed()) {
+//		if (this->joystick->IsBPressed()) {
+		if (this->joystick2->GetRawButton(5)) {
 			dropIntakeCanTalon->Set(-0.75f);
 		} else {
 			dropIntakeCanTalon->Set(0.f);

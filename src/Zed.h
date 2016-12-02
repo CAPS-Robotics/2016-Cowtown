@@ -27,6 +27,7 @@ class Zed : public SampleRobot
 public:
 	RobotDrive *drive;
 	MMRJoystick *joystick;
+	Joystick *joystick2;
 	CANTalon *dropIntakeCanTalon;
 	CANTalon *intakeCanTalon;
 	CANTalon *clutchCanTalon;
